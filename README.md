@@ -49,19 +49,8 @@ Bokeh servers enable the creation of interactive web applications that connect f
 
 We assume you have [installed conda](https://docs.conda.io/projects/continuumio-conda/en/latest/user-guide/install/macos.html).  Now build the tiler conda environment in a terminal:
 
-    conda create --name tiler
-    conda activate tiler
-    conda install -c conda-forge localtileserver
-    python -m ipykernel install --user --name tiler --display-name "tiler"
-    conda install -c conda-forge jupyterlab
-    conda install -c conda-forge bokeh
-    conda install -c conda-forge ipyleaflet
-    conda install -c conda-forge nb_conda_kernels
-    jupyter nbextension install --py --symlink --sys-prefix ipyleaflet
-    jupyter nbextension enable --py --sys-prefix ipyleaflet
-    pip install folium
-	pip install rasterio
-    pip install awscli
+	conda env create --file tiler_environment.yml
+	conda activate bokeh-tiler
 
 Now simply clone this repository:
 

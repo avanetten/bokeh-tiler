@@ -1,0 +1,17 @@
+# conda env create --file tiler_environment.yml
+# conda activate bokeh-tiler
+name: bokeh-tiler
+channels:
+- conda-forge
+- defaults
+dependencies:
+- localtileserver
+- jupyterlab
+- bokeh
+- ipyleaflet
+- nb_conda_kernels
+- pip
+- pip:
+  - folium
+  - rasterio
+  - awscli

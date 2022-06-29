@@ -8,7 +8,7 @@ Huge thanks to Bane Sullivan (https://localtileserver.banesullivan.com/user-guid
 for helping make this possible.
 
 Usage:
-    conda activate tiler
+    conda activate bokeh-tiler
     cd /path_to_spacenet_tiler/
     bokeh serve --show spacenet_tiler_bokeh.py --args /path_to_spacenet_cog.tif
 '''
