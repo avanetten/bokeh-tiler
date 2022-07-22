@@ -94,10 +94,11 @@ We need to make sure that the image is actually a COG (the creator of [localtile
 
 	gdal_translate AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_final.tif AOI_10_Dar_Es_Salaam_PS-RGB_REALCOG_clip_final.tif -of COG
 	# rm AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_final.tif # optional
+	
 	# check that the COG is valid:
 	python
 		from localtileserver.validate import validate_cog
-		validate_cog('AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_final.tif')
+		validate_cog('AOI_10_Dar_Es_Salaam_PS-RGB_REALCOG_clip_final.tif')
 		# True
 
 	
