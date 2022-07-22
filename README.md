@@ -17,7 +17,7 @@ See [bokeh_tiler.ipynb](/bokeh_tiler.ipynb) for detailed examples.  The followin
 
 	from localtileserver import get_leaflet_tile_layer, TileClient
 	from ipyleaflet import Map
-	image_path = 'path_to_spacenet_data/AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_final.tif'
+	image_path = 'path_to_spacenet_data/AOI_10_Dar_Es_Salaam_PS-RGB_REALCOG_clip_final.tif'
 	
 	# First, create a tile server from local raster file
 	tile_client = TileClient(image_path)
@@ -39,7 +39,7 @@ Bokeh servers enable the creation of interactive web applications that connect f
 
     conda activate tiler
     cd /path_to_bokeh_tiler/
-    bokeh serve --show bokeh_tiler_server.py --args /path_to_spacenet_data/AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_final.tif
+    bokeh serve --show bokeh_tiler_server.py --args /path_to_spacenet_data/AOI_10_Dar_Es_Salaam_PS-RGB_REALCOG_clip_final.tif
 
 ![bokehserver](imgs/bokeh_server_ex.png?raw=true "")
 
@@ -76,18 +76,28 @@ For this exercise, we'll explore SpaceNet Area of Interest (AOI) \#10: Dar Es Sa
 
 #### 3. Clip and Convert  Imagery
 
-While the tiler is able to handle images of arbitrary size and extent, for this exercise we will clip the image somewhat for visualization purposes.   
+While the tiler is able to handle images of arbitrary size and extent, for this exercise we will clip the image somewhat for visualization purposes. 
 
     cd $test_im_dir
-    gdal_translate -projwin 39.25252 -6.7580 39.28430 -6.788 AOI_10_Dar_Es_Salaam_PS-MS_COG.tif AOI_10_Dar_Es_Salaam_PS-MS_COG_clip.tif
+    gdal_translate -projwin 39.25252 -6.7580 39.28430 -6.788 AOI_10_Dar_Es_Salaam_PS-MS_COG.tif AOI_10_Dar_Es_Salaam_PS-MS_COG_clip_tmp.tif
 
-
-We will also convert the 8-band multispectral 16-bit image to an easier to visualize 8-bit RGB image. First we create a 8-bit image, then rescale the image to brighten it (while this theoretically can be done with a single command, in practice gdal pukes with a single command). The final output is the file `AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_final.tif`. 
+We will also convert the 8-band multispectral 16-bit image to an easier to visualize 8-bit RGB image. First we create a 8-bit image, then rescale the image to brighten it (while this theoretically can be done with a single command, in practice gdal pukes with a single command). The final output is the file `AOI_10_Dar_Es_Salaam_PS-RGB_REALCOG_clip_final.tif`. 
 
     cd $test_im_dir   
-	gdal_translate -ot Byte -of GTiff -a_nodata 0 -co "PHOTOMETRIC=rgb" -b 5 -scale_1 1 1950 0 255 -b 3 -scale_2 1 1600 0 255 -b 2 -scale_3 1 1600 0 255 AOI_10_Dar_Es_Salaam_PS-MS_COG_clip.tif AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_tmp.tif
-	gdal_translate -ot Byte -of GTiff -a_nodata 0 -co "PHOTOMETRIC=rgb" -scale 0 100 0 255 AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_tmp.tif  AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_final.tif
+	gdal_translate -ot Byte -of COG -a_nodata 0 -co "PHOTOMETRIC=rgb" -b 5 -scale_1 1 1950 0 255 -b 3 -scale_2 1 1600 0 255 -b 2 -scale_3 1 1600 0 255 AOI_10_Dar_Es_Salaam_PS-MS_COG_clip.tif AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_tmp.tif
+	gdal_translate -ot Byte -of COG -a_nodata 0 -co "PHOTOMETRIC=rgb" -scale 0 100 0 255 AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_tmp.tif  AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_final.tif
 	# rm AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_tmp.tif # optional
 	# The single command below "should" work instead of the two above, but gdal is finicky and the command below yields many nodata pixels.
 	# gdal_translate -ot Byte -of GTiff -a_nodata 0 -co "PHOTOMETRIC=rgb" -b 5 -scale_1 75.0 702.0 0 255 -b 3 -scale_2 87.0 556.0 0 255 -b 2 -scale_3 65.0 470.0 0 255 AOI_10_Dar_Es_Salaam_PS-MS_COG_clip.tif AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_final.tif
 
+We need to make sure that the image is actually a COG (the creator of [localtileserver](https://github.com/banesullivan/localtileserver) astutely noted that imagery stored on AWS aren't true COGs), so run the code below:
+
+	gdal_translate AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_final.tif AOI_10_Dar_Es_Salaam_PS-RGB_REALCOG_clip_final.tif -of COG
+	# rm AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_final.tif # optional
+	# check that the COG is valid:
+	python
+		from localtileserver.validate import validate_cog
+		validate_cog('AOI_10_Dar_Es_Salaam_PS-RGB_COG_clip_final.tif')
+		# True
+
+	
